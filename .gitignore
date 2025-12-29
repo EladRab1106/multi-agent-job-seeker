@@ -1,1 +1,9 @@
 results/
+# Python virtual environment
+venv/
+.env
+__pycache__/
+*.pyc
+
+# Playwright
+.playwright/
