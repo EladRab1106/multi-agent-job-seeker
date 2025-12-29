@@ -78,7 +78,39 @@ def build_graph():
     graph.add_edge("EXTRACT_SCHEMA", "MAP_FIELDS")
     graph.add_edge("MAP_FIELDS", "FILL_FORM")
     graph.add_edge("FILL_FORM", "VALIDATE_FORM")
-    graph.add_edge("VALIDATE_FORM", "CONFIRM_SUBMIT")
+
+    # ===== Form validation decision =====
+    def _is_form_valid(state):
+        """Check if all required fields have valid values."""
+        schema = state.form_schema
+        mapping = state.field_mapping
+
+        if schema is None or mapping is None:
+            return False
+
+        for field in schema.fields:
+            if field.required:
+                value = mapping.get(field.field_id)
+                if value is None or value == "" or value == []:
+                    return False
+
+        return True
+
+    graph.add_conditional_edges(
+        "VALIDATE_FORM",
+        lambda state: (
+            "CONFIRM_SUBMIT"
+            if _is_form_valid(state)
+            else "MAP_FIELDS"
+            if state.submission_attempts < state.max_submission_attempts
+            else "SUBMIT_FAILED"
+        ),
+        {
+            "CONFIRM_SUBMIT": "CONFIRM_SUBMIT",
+            "MAP_FIELDS": "MAP_FIELDS",
+            "SUBMIT_FAILED": "SUBMIT_FAILED",
+        },
+    )
 
     # ===== Submission decision =====
     graph.add_conditional_edges(
@@ -93,34 +125,6 @@ def build_graph():
             "SUBMIT_FAILED": "SUBMIT_FAILED",
         },
     )
-
-    graph.add_conditional_edges(
-        "VALIDATE_FORM",
-        lambda state: (
-            "CONFIRM_SUBMIT"
-            if _is_form_valid(state)
-            else "MAP_FIELDS"
-            if state.submission_attempts < state.max_submission_attempts
-            else "SUBMIT_FAILED"
-        ),
-        {
-        "CONFIRM_SUBMIT": "CONFIRM_SUBMIT",
-        "MAP_FIELDS": "MAP_FIELDS",
-        "SUBMIT_FAILED": "SUBMIT_FAILED",
-        },
-    )
-
-    def _is_form_valid(state):
-        schema = state.form_schema
-        mapping = state.field_mapping
-
-        for field in schema.fields:
-            if field.required:
-                value = mapping.get(field.field_id)
-                if value is None or value == "" or value == []:
-                    return False
-
-        return True
 
 
 

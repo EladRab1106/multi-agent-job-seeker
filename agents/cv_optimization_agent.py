@@ -1,5 +1,6 @@
 import logging
 import time
+from abc import ABC, abstractmethod
 from openai import OpenAI, OpenAIError
 
 from models.cv import CV
@@ -9,8 +10,30 @@ from models.optimized_cv import OptimizedCV
 logger = logging.getLogger(__name__)
 
 
-class CVOptimizationAgent:
+class CVOptimizationAgent(ABC):
     """
+    Abstract base class for CV optimization agents.
+    All optimizers must implement the optimize() method.
+    """
+
+    @abstractmethod
+    def optimize(self, cv: CV, job: Job) -> OptimizedCV:
+        """
+        Optimize a CV for a specific job.
+        
+        Args:
+            cv: The original CV to optimize
+            job: The target job description
+            
+        Returns:
+            OptimizedCV: A job-specific optimized version of the CV
+        """
+        pass
+
+
+class OpenAICVOptimizationAgent(CVOptimizationAgent):
+    """
+    CV optimization agent using OpenAI.
     Responsible for tailoring a CV to a specific job description using OpenAI.
     """
 
@@ -30,12 +53,12 @@ class CVOptimizationAgent:
                     job.company,
                 )
 
-                optimized_text = self._call_openai(cv, job)
+                full_text = self._call_openai(cv, job)
 
                 return OptimizedCV(
                     original_cv=cv,
                     job=job,
-                    optimized_text=optimized_text,
+                    full_text=full_text,
                 )
 
             except OpenAIError as e:

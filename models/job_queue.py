@@ -6,8 +6,7 @@ from models.job import Job
 
 class JobQueue(BaseModel):
     """
-    FIFO queue of job positions to be processed by the Submission Agent.
-    This object owns iteration order and guarantees deterministic execution.
+    FIFO queue of job positions to be processed.
     """
 
     jobs: List[Job] = Field(default_factory=list)
@@ -17,7 +16,7 @@ class JobQueue(BaseModel):
 
     def pop_next(self) -> Job:
         if self.is_empty():
-            raise IndexError("Cannot pop from an empty JobQueue")
+            raise IndexError("Cannot pop from empty JobQueue")
         return self.jobs.pop(0)
 
     def add(self, job: Job) -> None:

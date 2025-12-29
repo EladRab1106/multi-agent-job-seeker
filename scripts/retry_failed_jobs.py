@@ -2,7 +2,7 @@ from storage.result_store import ResultStore
 from models.cv import CV
 from models.job import Job
 from models.job_queue import JobQueue
-from agents.cv_optimization_agent import CVOptimizationAgent
+from agents.cv_optimization_agent import OpenAICVOptimizationAgent
 from agents.submission_agent import SubmissionAgent
 
 
@@ -25,7 +25,7 @@ def retry_failed(filepath: str, cv: CV):
         return
 
     job_queue = JobQueue(failed_jobs)
-    optimizer = CVOptimizationAgent()
+    optimizer = OpenAICVOptimizationAgent()
     submission_agent = SubmissionAgent(optimizer)
 
     submission_agent.process_jobs(cv, job_queue)

@@ -1,13 +1,8 @@
-from typing import List, Optional
 from pydantic import BaseModel
-
-from models.submission.form_field import FormField
-
+from typing import List
+from .form_field import FormField
 
 class SubmissionFormSchema(BaseModel):
-    ats_type: Optional[str] = None            # greenhouse / lever / workday / custom
-    form_url: Optional[str] = None
-
+    ats_type: str        # "greenhouse"
+    form_url: str
     fields: List[FormField]
-
-    version: str = "1.0"

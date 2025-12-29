@@ -8,7 +8,7 @@ from models.cv import CV
 from agents.job_matching_agent import JobMatchingAgent
 from storage.result_store import ResultStore
 
-from agents.cv_optimization_agent import CVOptimizationAgent
+from agents.cv_optimization_agent import OpenAICVOptimizationAgent
 from agents.submission_agent import SubmissionAgent
 
 from graph.state import GraphState
@@ -29,7 +29,7 @@ def main():
     result_store = ResultStore(cv.full_name)
 
     # 🔑 Instantiate shared runtime agents
-    optimizer = CVOptimizationAgent()
+    optimizer = OpenAICVOptimizationAgent()
     submission_agent = SubmissionAgent(optimizer)
 
     graph = build_graph()
